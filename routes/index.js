@@ -126,4 +126,129 @@ router.post('/grupp-terminal-transactions', function(req, res, next) {
 
 });
 
+router.post('/grupp-bank-list', function(req, res, next) {
+
+  const terminalID=req.body.terminal;
+  const sessionID=req.body.session;
+
+  var options = {
+    'method': 'GET',
+    'url': `${baseURL}banks`,
+    'headers': {
+      'Authorization': req.headers['authorization'],
+      'Content-Type': 'application/json',
+      'terminalId': terminalID
+    },
+    body: null
+
+  };
+  request(options, function (error, response) {
+    if (error) throw new Error(error);
+    console.log(response.body);
+    var body=JSON.parse(response.body);
+
+    console.log(body.data);
+    console.log(sessionID);
+    console.log(terminalID);
+
+    // usage
+    const instance = new Encryption(sessionID);
+    // console.log(instance.encrypt("test-key"));
+    decrytedValue=instance.decrypt(body.data.toString());
+    console.log(decrytedValue);
+
+    return res.json(JSON.parse(decrytedValue));
+  });
+
+});
+
+router.post('/grupp-validate-bank', function(req, res, next) {
+
+  const terminalID=req.body.terminal;
+  const sessionID=req.body.session;
+
+  const instance = new Encryption(sessionID);
+
+  var payload = instance.encrypt(JSON.stringify({ "bankCode": req.body.bankCode, "accountNumber": req.body.accountNumber }));
+
+  console.log(payload);
+
+  var options = {
+    'method': 'POST',
+    'url': `${baseURL}account-validation`,
+    'headers': {
+      'Authorization': req.headers['authorization'],
+      'Content-Type': 'application/json',
+      'terminalId': terminalID
+    },
+    body: payload
+
+  };
+  request(options, function (error, response) {
+    if (error) throw new Error(error);
+    console.log(response.body);
+    var body=JSON.parse(response.body);
+
+    console.log(body.data);
+    console.log(sessionID);
+    console.log(terminalID);
+
+    // usage
+    // console.log(instance.encrypt("test-key"));
+    decrytedValue=instance.decrypt(body.data.toString());
+    console.log(decrytedValue);
+
+    return res.json(JSON.parse(decrytedValue));
+  });
+
+});
+
+router.post('/grupp-bank-transfer', function(req, res, next) {
+
+  const terminalID=req.body.terminal;
+  const sessionID=req.body.session;
+
+  const instance = new Encryption(sessionID);
+
+  var payload = instance.encrypt(JSON.stringify({
+    "amount": req.body.amount,
+    "stan": req.body.stan,
+    "pin": req.body.pin,
+    "accountNumber": req.body.accountNumber,
+    "bankCode": req.body.bankCode,
+    "type": "TRANSFER"
+  }));
+
+  console.log(payload);
+
+  var options = {
+    'method': 'POST',
+    'url': `${baseURL}transaction`,
+    'headers': {
+      'Authorization': req.headers['authorization'],
+      'Content-Type': 'application/json',
+      'terminalId': terminalID
+    },
+    body: payload
+
+  };
+  request(options, function (error, response) {
+    if (error) throw new Error(error);
+    console.log(response.body);
+    var body=JSON.parse(response.body);
+
+    console.log(body.data);
+    console.log(sessionID);
+    console.log(terminalID);
+
+    // usage
+    // console.log(instance.encrypt("test-key"));
+    decrytedValue=instance.decrypt(body.data.toString());
+    console.log(decrytedValue);
+
+    return res.json(JSON.parse(decrytedValue));
+  });
+
+});
+
 module.exports = router;
