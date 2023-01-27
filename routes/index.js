@@ -251,4 +251,57 @@ router.post('/grupp-bank-transfer', function(req, res, next) {
 
 });
 
+router.post('/grupp-card-request', function(req, res, next) {
+
+  const terminalID=req.body.terminal;
+  const sessionID=req.body.session;
+
+  const {pan,stan,rrn,amount,iccData,track2Data,postDataCode,cardExpiryDate,acquiringInstitutionalCode,sequenceNumber,pin,accountType,type} =req.body;
+
+  const instance = new Encryption(sessionID);
+
+  var json=JSON.stringify({
+    pan,stan,rrn,amount,iccData,track2Data,postDataCode,cardExpiryDate,acquiringInstitutionalCode,sequenceNumber,pin,accountType,type
+  });
+
+  var url=`${baseURL}transaction`;
+
+  var payload = instance.encrypt(json);
+
+  console.log(url);
+  console.log(json);
+  console.log(payload);
+
+  var options = {
+    'method': 'POST',
+    'url': url,
+    'headers': {
+      'Authorization': req.headers['authorization'],
+      'Content-Type': 'application/json',
+      'terminalId': terminalID
+    },
+    body: payload
+
+  };
+  request(options, function (error, response) {
+    if (error) throw new Error(error);
+    console.log(response.body);
+    var body=JSON.parse(response.body);
+
+    console.log(body.data);
+    console.log(sessionID);
+    console.log(terminalID);
+
+    try {
+      decrytedValue = instance.decrypt(body.data.toString());
+      console.log(decrytedValue);
+
+      return res.json(JSON.parse(decrytedValue));
+    }catch (e) {
+      return res.json(body);
+    }
+  });
+
+});
+
 module.exports = router;
