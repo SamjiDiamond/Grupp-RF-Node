@@ -65,6 +65,8 @@ router.get('/encryption', function(req, res, next) {
 
 router.post('/grupp-login', function(req, res, next) {
 
+  console.log(Date.now())
+
   var options = {
     'method': 'POST',
     'url': `${GRUPPTERMINAL_BASEURL}network-mgt`,
@@ -87,6 +89,8 @@ router.post('/grupp-login', function(req, res, next) {
 });
 
 router.post('/grupp-terminal-transactions', function(req, res, next) {
+
+  console.log(new Date());
 
   const terminalID=req.body.terminal;
   const sessionID=req.body.session;
@@ -127,6 +131,8 @@ router.post('/grupp-terminal-transactions', function(req, res, next) {
 });
 
 router.post('/grupp-card-request', function(req, res, next) {
+
+  console.log(Date.now())
 
   const terminalID=req.body.terminal;
   const sessionID=req.body.session;
