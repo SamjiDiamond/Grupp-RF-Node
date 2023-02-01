@@ -66,6 +66,9 @@ router.get('/encryption', function(req, res, next) {
 router.post('/grupp-login', function(req, res, next) {
 
   console.log(Date.now())
+  console.log(Date.now().toString().substr(6,6))
+
+  const {serialNumber}=req.body;
 
   var options = {
     'method': 'POST',
@@ -74,7 +77,11 @@ router.post('/grupp-login', function(req, res, next) {
       'Authorization': `Basic ${GRUPPTERMINAL_AUTH}`,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(req.body)
+    body: JSON.stringify({
+      "serialNumber": serialNumber,
+      "stan": Date.now().toString().substr(6,6),
+      "onlyAccountInfo": false
+    })
 
   };
 
